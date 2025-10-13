@@ -4,7 +4,7 @@
 1.輸入兩個整數m、n(皆為正整數)。  
 2.根據遞迴定義，計算A(m,n)並輸出結果。  
 3.Ackermann遞迴定義  
-![Ackermann遞迴定義](https://github.com/41343112/HomeWork/blob/main/homework1/src/ackermann.png)
+![Ackermann遞迴定義](https://github.com/41343112/HomeWorks/blob/main/homework1/src/ackermann.png)
 ### 解題策略  
 1.當m==0時，回傳n+1。  
 2.當n==0時，回傳A(m-1,1)。  
