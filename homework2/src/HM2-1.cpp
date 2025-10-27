@@ -4,30 +4,30 @@ using namespace std;
 
 class Polynomial;  // forward declaration
 
-// ------------------ Term Ãş§O ------------------
+// ------------------ Term é¡åˆ¥ ------------------
 class Term {
-    friend class Polynomial; // Åı Polynomial ¥i¥Hª½±µ¦s¨ú Term ªº¦¨­û
+    friend class Polynomial; // è®“ Polynomial å¯ä»¥ç›´æ¥å­˜å– Term çš„æˆå“¡
 private:
-    float coef;  // «Y¼Æ
-    int exp;     // «ü¼Æ
+    float coef;  // ä¿‚æ•¸
+    int exp;     // æŒ‡æ•¸
 };
 
-// ------------------ Polynomial Ãş§O ------------------
+// ------------------ Polynomial é¡åˆ¥ ------------------
 class Polynomial {
 private:
-    Term* termArray;  // Àx¦s«D¹s¶µªº°}¦C
-    int capacity;     // °}¦C®e¶q
-    int terms;        // ¹ê»Ú¨Ï¥Î¤¤ªº¶µ¼Æ
+    Term* termArray;  // å„²å­˜éé›¶é …çš„é™£åˆ—
+    int capacity;     // é™£åˆ—å®¹é‡
+    int terms;        // å¯¦éš›ä½¿ç”¨ä¸­çš„é …æ•¸
 
 public:
-    // «Øºc¤l¡G«Ø¥ß p(x)=0
+    // å»ºæ§‹å­ï¼šå»ºç«‹ p(x)=0
     Polynomial() {
         capacity = 10;
         terms = 0;
         termArray = new Term[capacity];
     }
 
-    // «ş¨©«Øºc¤l
+    // æ‹·è²å»ºæ§‹å­
     Polynomial(const Polynomial& poly) {
         capacity = poly.capacity;
         terms = poly.terms;
@@ -38,16 +38,16 @@ public:
 
 
 
-    // ´¡¤J¤@­Ó·s¶µ¡]¤º³¡¨Ï¥Î¡^
+    // æ’å…¥ä¸€å€‹æ–°é …ï¼ˆå…§éƒ¨ä½¿ç”¨ï¼‰
     void NewTerm(float c, int e) {
-        if (c == 0) return; // ¤£¥[¤J¹s«Y¼Æ
+        if (c == 0) return; // ä¸åŠ å…¥é›¶ä¿‚æ•¸
 
-        // ­Y¦³¬Û¦Pªº«ü¼Æ¶µ¡A«h¦X¨Ö
+        // è‹¥æœ‰ç›¸åŒçš„æŒ‡æ•¸é …ï¼Œå‰‡åˆä½µ
         for (int i = 0; i < terms; i++) {
             if (termArray[i].exp == e) {
                 termArray[i].coef += c;
                 if (termArray[i].coef == 0) {
-                    // ­Y¦X¨Ö«áÅÜ¦¨ 0¡A«h§R°£¦¹¶µ
+                    // è‹¥åˆä½µå¾Œè®Šæˆ 0ï¼Œå‰‡åˆªé™¤æ­¤é …
                     for (int j = i; j < terms - 1; j++)
                         termArray[j] = termArray[j + 1];
                     terms--;
@@ -56,7 +56,7 @@ public:
             }
         }
 
-        // ­Y°}¦Cº¡¡AÂX¥R®e¶q
+        // è‹¥é™£åˆ—æ»¿ï¼Œæ“´å……å®¹é‡
         if (terms == capacity) {
             capacity *= 2;
             Term* temp = new Term[capacity];
@@ -66,12 +66,12 @@ public:
             termArray = temp;
         }
 
-        // ´¡¤J·s¶µ
+        // æ’å…¥æ–°é …
         termArray[terms].coef = c;
         termArray[terms].exp = e;
         terms++;
 
-        // «O«ù¥H«ü¼Æ»¼´î±Æ§Ç
+        // ä¿æŒä»¥æŒ‡æ•¸éæ¸›æ’åº
         for (int i = 0; i < terms - 1; i++) {
             for (int j = i + 1; j < terms; j++) {
                 if (termArray[i].exp < termArray[j].exp)
@@ -100,7 +100,7 @@ public:
                 bPos++;
             }
         }
-        // ³Ñ¾l¶µ
+        // å‰©é¤˜é …
         for (; aPos < terms; aPos++)
             result.NewTerm(termArray[aPos].coef, termArray[aPos].exp);
         for (; bPos < poly.terms; bPos++)
@@ -112,20 +112,20 @@ public:
     Polynomial Mult(Polynomial poly) {
         Polynomial result;
 
-        // ¹ï this ªº¨C¤@¶µ
+        // å° this çš„æ¯ä¸€é …
         for (int i = 0; i < terms; i++) {
             Polynomial temp;
 
-            // ¹ï poly ªº¨C¤@¶µ
+            // å° poly çš„æ¯ä¸€é …
             for (int j = 0; j < poly.terms; j++) {
                 float newCoef = termArray[i].coef * poly.termArray[j].coef;
                 int newExp = termArray[i].exp + poly.termArray[j].exp;
 
-                // ¼È®É­¼¥Xªº¨C¤@¶µ©ñ¶i temp
+                // æš«æ™‚ä¹˜å‡ºçš„æ¯ä¸€é …æ”¾é€² temp
                 temp.NewTerm(newCoef, newExp);
             }
 
-            // ²Ö¥[¨ìµ²ªG¡]¥Î Add() ¦X¨Ö¦PÃş¶µ¡^
+            // ç´¯åŠ åˆ°çµæœï¼ˆç”¨ Add() åˆä½µåŒé¡é …ï¼‰
             result = result.Add(temp);
         }
 
@@ -140,7 +140,7 @@ public:
         return result;
     }
 
-    // ------------------ ¿é¥X¦h¶µ¦¡ ------------------
+    // ------------------ è¼¸å‡ºå¤šé …å¼ ------------------
     void Show() {
         if (terms == 0) {
             cout << "0" << endl;
@@ -151,12 +151,12 @@ public:
             float c = termArray[i].coef;
             int e = termArray[i].exp;
 
-            // ¦L¥X²Å¸¹
+            // å°å‡ºç¬¦è™Ÿ
             if (i > 0) {
                 if (c >= 0) cout << " + ";
                 else {
                     cout << " - ";
-                    c = -c; // ±N«Y¼ÆÂà¬°¥¿¼Æ¿é¥X
+                    c = -c; // å°‡ä¿‚æ•¸è½‰ç‚ºæ­£æ•¸è¼¸å‡º
                 }
             }
             else {
@@ -166,13 +166,13 @@ public:
                 }
             }
 
-            // ®Ú¾Ú¤£¦P«ü¼Æ¿é¥X®æ¦¡
+            // æ ¹æ“šä¸åŒæŒ‡æ•¸è¼¸å‡ºæ ¼å¼
             if (e == 0)
-                cout << c;               // ±`¼Æ¶µ
+                cout << c;               // å¸¸æ•¸é …
             else if (e == 1)
-                cout << c << "x";        // ¤@¦¸¶µ
+                cout << c << "x";        // ä¸€æ¬¡é …
             else
-                cout << c << "x^" << e;  // ¨ä¥L¦¸¤è
+                cout << c << "x^" << e;  // å…¶ä»–æ¬¡æ–¹
         }
 
         cout << endl;
