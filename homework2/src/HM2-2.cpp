@@ -35,6 +35,11 @@ public:
         for (int i = 0; i < terms; i++) {
             if (termArray[i].exp == e) {
                 termArray[i].coef += c;
+                   if (termArray[i].coef == 0) {
+                      for (int j = i; j < terms - 1; j++)
+                          termArray[j] = termArray[j + 1];
+                      terms--;
+                }
                 return;
             }
         }
