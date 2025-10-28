@@ -271,4 +271,8 @@ int main() {
 |$Eval()$|$O(k)$  |$O(1)$   |
 |$Show()$|$O(k)$  |$O(1)$   |
 
-## 測試與驗證
+## 測試與驗證  
+
+|測試案例|設定參數|預期輸出|實際輸出|
+|-------|-------|--------|-------|
+|測試一 |p1.NewTerm(3,2)<br>p1.NewTerm(2,1)<br>p1.NewTerm(1,0)<br><br>p2.NewTerm(1,1)<br>p2.NewTerm(1,0)|P1(x) = $3x^2 + 2x + 1$<br> P2(x) =1x + 1 <br>Sum = $3x^2 + 3x + 2$<br>Product = $3x^3 + 5x^2 + 3x + 1$<br>P1(2) = 17|P1(x) = $3x^2 + 2x + 1$<br> P2(x) =1x + 1 <br>Sum = $3x^2 + 3x + 2$<br>Product = $3x^3 + 5x^2 + 3x + 1$<br>P1(2) = 17|
