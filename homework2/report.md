@@ -275,4 +275,14 @@ int main() {
 
 |測試案例|設定參數|預期輸出|實際輸出|
 |-------|-------|--------|-------|
-|測試一 |p1.NewTerm(3,2)<br>p1.NewTerm(2,1)<br>p1.NewTerm(1,0)<br><br>p2.NewTerm(1,1)<br>p2.NewTerm(1,0)|P1(x) = $3x^2 + 2x + 1$<br> P2(x) =1x + 1 <br>Sum = $3x^2 + 3x + 2$<br>Product = $3x^3 + 5x^2 + 3x + 1$<br>P1(2) = 17|P1(x) = $3x^2 + 2x + 1$<br> P2(x) =1x + 1 <br>Sum = $3x^2 + 3x + 2$<br>Product = $3x^3 + 5x^2 + 3x + 1$<br>P1(2) = 17|
+|測試一 |p1.NewTerm(3,2)<br>p1.NewTerm(2,1)<br>p1.NewTerm(1,0)<br><br>p2.NewTerm(1,1)<br>p2.NewTerm(1,0)|P1(x) = $3x^2 + 2x + 1$<br> P2(x) =1x + 1 <br>Sum = $3x^2 + 3x + 2$<br>Product = $3x^3 + 5x^2 + 3x + 1$<br>P1(2) = 17|P1(x) = $3x^2 + 2x + 1$<br> P2(x) =1x + 1 <br>Sum = $3x^2 + 3x + 2$<br>Product = $3x^3 + 5x^2 + 3x + 1$<br>P1(2) = 17|  
+
+
+### 結論  
+
+  1.程式成功實現各種功能。  
+  2.每個步驟輸出正確。  
+  3.顯示順序清楚，格式易讀。  
+
+## 申論及開發報告
+  
