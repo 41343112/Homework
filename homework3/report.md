@@ -213,13 +213,15 @@ void insert(int idx, const T& element) {
 ```
 優先從 Available List 取得節點，若索引不合法，節點會被回收，確保鏈結串列結構正確。
 ### Term 結構
+```cpp
 struct Term {
     double coef;
     int exp;
     Term() : coef(0.0), exp(0) {}
     Term(double c, int e) : coef(c), exp(e) {}
 };
-
+```
+coef：係數、 exp：指數。
 ### 多項式新增項目（newTerm）
 ```cpp
 void newTerm(double coef, int exp) {
@@ -246,47 +248,142 @@ void newTerm(double coef, int exp) {
 ```cpp
 Polynomial operator+(const Polynomial& other) const {
     Polynomial result;
-    auto it1 = begin();
-    auto it2 = other.begin();
-
-    while (it1 != end() && it2 != other.end()) {
-        if (it1->exp > it2->exp)
-            result.newTerm(it1->coef, it1->exp), ++it1;
-        else if (it1->exp < it2->exp)
-            result.newTerm(it2->coef, it2->exp), ++it2;
+    ChainIterator<Term> it1 = this->begin();
+    ChainIterator<Term> it2 = other.begin();
+    while (it1 != this->end() && it2 != other.end()) {
+        if (it1->exp > it2->exp) {
+            result.newTerm(it1->coef, it1->exp);
+            ++it1;
+        }
+        else if (it1->exp < it2->exp) {
+            result.newTerm(it2->coef, it2->exp);
+            ++it2;
+        }
         else {
-            result.newTerm(it1->coef + it2->coef, it1->exp);
+            double newCoef = it1->coef + it2->coef;
+            if (newCoef != 0) result.newTerm(newCoef, it1->exp);
             ++it1; ++it2;
         }
     }
+    while (it1 != this->end()) {
+        result.newTerm(it1->coef, it1->exp);
+        ++it1;
+    }
+    while (it2 != other.end()) {
+        result.newTerm(it2->coef, it2->exp);
+        ++it2;
+    }
     return result;
 }
+
 ```
 同時走訪兩個多項式，指數大的項先加入結果，指數相同則合併係數。
 ### 多項式乘法運算實作
 ```cpp
 Polynomial operator*(const Polynomial& other) const {
     Polynomial result;
-    for (auto it1 = begin(); it1 != end(); ++it1)
-        for (auto it2 = other.begin(); it2 != other.end(); ++it2)
-            result.newTerm(it1->coef * it2->coef,
-                           it1->exp + it2->exp);
+    for (ChainIterator<Term> it1 = this->begin(); it1 != this->end(); ++it1) {
+        for (ChainIterator<Term> it2 = other.begin(); it2 != other.end(); ++it2) {
+            double newCoef = it1->coef * it2->coef;
+            int newExp = it1->exp + it2->exp;
+            result.newTerm(newCoef, newExp);
+        }
+    }
     return result;
 }
+
 ```
 乘法使用雙層迴圈，將每一項互相相乘，並透過 newTerm() 自動合併同指數項。
 ### 多項式代值計算（Evaluate）
 ```cpp
 float Evaluate(float x) const {
     float result = 0.0f;
-    for (auto it = begin(); it != end(); ++it) {
+    for (ChainIterator<Term> it = begin(); it != end(); ++it) {
+        float termValue = it->coef;
+        int exp = it->exp;
         float power = 1.0f;
-        for (int i = 0; i < it->exp; ++i)
-            power *= x;
-        result += it->coef * power;
+        for (int i = 0; i < exp; ++i) power *= x;
+        result += termValue * power;
     }
     return result;
 }
+
 ```
 此函式計算多項式在指定 x 值下的結果，透過逐次乘法計算次方，並將每一項累加。
+### 輸入運算子
+```cpp
+istream& operator>>(std::istream& is, Polynomial& poly) {
+    int numTerms;
+    if (!(is >> numTerms)) return is;
+    for (int i = 0; i < numTerms; ++i) {
+        double coef;
+        int exp;
+        std::cout << "輸入第"<<i+1<<"的係數、指數:";
+        is >> coef >> exp;
+        poly.newTerm(coef, exp);
+    }
+    return is;
+}
+```
+### 輸出運算子
+```cpp
+ostream& operator<<(std::ostream& os, const Polynomial& poly) {
+    bool first = true;
+    for (ChainIterator<Term> it = poly.begin(); it != poly.end(); ++it) {
+        if (!first) os << " + ";
+        first = false;
+        os << it->coef << "x^" << it->exp;
+    }
+    return os;
+}
 
+```
+## 效能分析
+
+| 操作 | 功能說明 | 時間複雜度 | 空間複雜度 | 備註 |
+|-------------|----------|------------|------------|------|
+| **ChainNode** | 單一節點，儲存元素與指標 | O(1) | O(1) | 建構或設置元素均為常數時間 |
+| **ChainIterator** | 遍歷鏈結串列 | `operator++() / operator*() / operator->()`: O(1)<br>`operator-()`: O(n) | O(1) | 儲存當前節點指標，`operator-` 計算距離需遍歷 |
+| **AvailableList** | 管理可重用節點，避免頻繁 new/delete | `getNode()/getBack()`: O(k) | O(n) | k 為回收或取出節點數，n 為節點總數 |
+| **Chain** | 單向鏈結串列 | `insert(idx)`: O(n)<br>`release()`: O(1) | O(n) | 插入需要遍歷到 idx，釋放鏈表頭節點為 O(1) |
+| **Term** | 多項式單項式 (coef, exp) | O(1) | O(1) | 每個 Term 儲存係數與指數 |
+| **Polynomial::newTerm()** | 新增或合併多項式項 | O(n) | O(1) | n 為多項式目前項數，插入或合併相同指數項 |
+| **Polynomial 計算運算** | 多項式加、減、乘、Evaluate | 加/減: O(n + m)<br>乘: O(n * m)<br>Evaluate: O(n * k) | O(n + m + n*m) | n、m 為多項式項數，k 為最大指數；Evaluate 計算 x 的冪次並累加 |
+| **operator>>** | 輸入多項式 | O(n) | O(n) | n 為輸入項數，每項呼叫 newTerm |
+| **operator<<** | 輸出多項式 | O(n) | O(1) | 遍歷鏈表輸出每項，無額外空間 |
+
+## 測試與驗證
+### 測試案例
+
+| 測試案例 | 輸入參數   | 預期輸出  | 實際輸出  | 
+|----------|--------------|----------|----------|
+| 第一個多項式 |3<br> 100 0<br> 5 3<br>2 6 |2x^6 + 5x^3 + 100x^0|2x^6 + 5x^3 + 100x^0|   
+| 第二個多項式 |2<br> 10 1<br>8 2|3x^5 + 10x^3|3x^5 + 10x^3|   
+|A+B| |2x^6 + 3x^5 + 15x^3 + 100x^0|2x^6 + 3x^5 + 15x^3 + 100x^0|
+|A-B| |2x^6 + -3x^5 + -5x^3 + 100x^0|2x^6 + -3x^5 + -5x^3 + 100x^0|
+|A*B| |6x^11 + 20x^9 + 15x^8 + 50x^6 + 300x^5 + 1000x^3|6x^11 + 20x^9 + 15x^8 + 50x^6 + 300x^5 + 1000x^3|
+|A(2)| |268|268|
+
+
+
+### 測試輸入
+```
+輸入A的項數:3
+輸入第1的指數、係數:100 3
+輸入第2的指數、係數:5 3 
+輸入第3的指數、係數:2 6 
+輸入B的項數:2
+輸入第1的指數、係數:10 3
+輸入第2的指數、係數:3 5 
+輸入x為多少:2
+```
+### 測試輸出
+```
+A = 2x^6 + 5x^3 + 100x^0
+B = 3x^5 + 10x^3
+A + B = 2x^6 + 3x^5 + 15x^3 + 100x^0
+A - B = 2x^6 + -3x^5 + -5x^3 + 100x^0
+A * B = 6x^11 + 20x^9 + 15x^8 + 50x^6 + 300x^5 + 1000x^3
+A(2) = 268
+```
+## 申論與開發報告
